@@ -17,7 +17,10 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     require: true,
-    link: validators.isURL(),
+    validete: {
+      validators: (url) => validators.isURL(url),
+      message: 'Не верный формат ссылки'
+    }
   }
 
 });
