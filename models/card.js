@@ -13,22 +13,22 @@ const cardSchema = new mongoose.Schema({
     require: true,
     validete: {
       validators: (url) => validators.isURL(url),
-      message: 'Не верный формат ссылки'
-    }
+      message: 'Не верный формат ссылки',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     require: true,
-    ref: 'user'
+    ref: 'user',
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
-    default: []
+    default: [],
   }],
   createdAt: {
     type: Date,
     default: Date.now,
-  }
+  },
 });
 
 module.exports = mongoose.model('card', cardSchema);

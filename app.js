@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 app.use((req, _res, next) => {
   req.user = {
-    _id: '64b2de316e9b6d425100f594' // вставьте сюда _id созданного в предыдущем пункте пользователя
+    _id: '64b2de316e9b6d425100f594', // вставьте сюда _id созданного в предыдущем пункте пользователя
   };
 
   next();
@@ -24,8 +24,8 @@ app.use('/cards', routerCard);
 app.use('/users', routerUser);
 
 app.get('/', (_req, res, next) => {
-  res.status(404).send({message: 'Запрашиваемая страница не найдена!'});
-  next()
+  res.status(404).send({ message: 'Запрашиваемая страница не найдена!' });
+  next();
 });
 
 app.listen(PORT, () => {

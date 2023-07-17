@@ -19,9 +19,9 @@ const userSchema = new mongoose.Schema({
     require: true,
     validete: {
       validators: (url) => validators.isURL(url),
-      message: 'Не верный формат ссылки'
-    }
-  }
+      message: 'Не верный формат ссылки',
+    },
+  },
 
 });
 
