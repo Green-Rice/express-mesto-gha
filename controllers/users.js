@@ -7,21 +7,23 @@ const getUsers = (_req, res) => {
 };
 
 const getUserId = (req, res) => {
-  const { user_Id } = req.params;
-  User.findById(user_Id)
+  const { userId } = req.params;
+  User.findById(userId)
     .then((user) => {
       if (user) {
         res.status(200).send(user);
       } else {
-        res.status(404).send(`Пользователь с id: ${user_Id} не найден`);
+        res.status(404).send({ message: 'Пользователь не найден' });
       }
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({ message: `Пользователь с id: ${user_Id} не найден` });
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены не верные данные id пользователя' });
+        res.status(400).send({ message: 'Введены не верные данные id пользователя' });
+        return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
@@ -33,7 +35,8 @@ const createNewUser = (req, res) => {
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Передали не валидные данные в форму' });
+        res.status(400).send({ message: 'Передали не валидные данные в форму' });
+        return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
@@ -51,13 +54,16 @@ const updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({ message: `Пользователь с id: ${user_Id} не найден` });
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
       }
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Передали не валидные данные в форму' });
+        res.status(400).send({ message: 'Передали не валидные данные в форму' });
+        return;
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены не верные данные id пользователя' });
+        res.status(400).send({ message: 'Введены не верные данные id пользователя' });
+        return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
@@ -75,13 +81,16 @@ const updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({ message: `Пользователь с id: ${user_Id} не найден` });
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
       }
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Передали не валидные данные в форму' });
+        res.status(400).send({ message: 'Передали не валидные данные в форму' });
+        return;
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены не верные данные id пользователя' });
+        res.status(400).send({ message: 'Введены не верные данные id пользователя' });
+        return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });

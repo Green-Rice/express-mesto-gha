@@ -6,7 +6,7 @@ const {
 
 router.post('/', createNewUser);
 router.get('/', getUsers);
-router.get('/:user_Id', getUserId);
+router.get('/:userId', getUserId);
 router.patch('/me', updateUser);
 router.patch('/me/avatar', updateAvatar);
 

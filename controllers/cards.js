@@ -12,29 +12,31 @@ const createNewCard = (req, res) => {
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Передали не валидные данные в форму' });
+        res.status(400).send({ message: 'Передали не валидные данные в форму' });
+        return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
 };
 
 const deleteCardById = (req, res) => {
-  const { card_Id } = req.params;
-  Card.findByIdAndRemove(card_Id)
+  const { cardId } = req.params;
+  Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (card) {
         res.status(201).send(card);
-        console.log(`удалили карточку с id: ${card_Id}`);
       } else {
-        res.status(404).send(`Карточка с id: ${card_Id} не найдена`);
+        res.status(404).send('Карточкане не найдена');
       }
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({ message: `Карточка с id: ${card_Id} не найдена` });
+        res.status(404).send({ message: 'Карточкане не найдена' });
+        return;
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены не верные данные id карточки' });
+        res.status(400).send({ message: 'Введены не верные данные id карточки' });
+        return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
@@ -50,15 +52,17 @@ const setLikesCard = (req, res) => {
       if (card) {
         res.status(201).send(card);
       } else {
-        res.status(404).send(`Карточка с id: ${card_Id} не найдена`);
+        res.status(404).send({ message: 'Карточкане не найдена' });
       }
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({ message: `Карточка с id: ${card_Id} не найдена` });
+        res.status(404).send({ message: 'Карточкане не найдена' });
+        return;
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены не верные данные id карточки' });
+        res.status(400).send({ message: 'Введены не верные данные id карточки' });
+        return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
@@ -74,15 +78,17 @@ const removeLikesCard = (req, res) => {
       if (card) {
         res.status(201).send(card);
       } else {
-        res.status(404).send(`Карточка с id: ${card_Id} не найдена`);
+        res.status(404).send({ message: 'Карточкане не найдена' });
       }
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({ message: `Карточка с id: ${card_Id} не найдена` });
+        res.status(404).send({ message: 'Карточкане не найдена' });
+        return;
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены не верные данные id карточки' });
+        res.status(400).send({ message: 'Введены не верные данные id карточки' });
+        return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
