@@ -4,13 +4,13 @@ const validators = require('validator');
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
     minlength: 2,
     maxlength: 30,
   },
   link: {
     type: String,
-    require: true,
+    required: true,
     validete: {
       validators: (url) => validators.isURL(url),
       message: 'Не верный формат ссылки',
@@ -18,7 +18,7 @@ const cardSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    require: true,
+    required: true,
     ref: 'user',
   },
   likes: [{
