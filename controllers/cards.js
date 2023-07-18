@@ -70,7 +70,7 @@ const setLikesCard = (req, res) => {
 
 const removeLikesCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.card_Id,
+    req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
