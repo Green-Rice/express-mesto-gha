@@ -24,17 +24,17 @@ const deleteCardById = (req, res) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (card) {
-        res.status(201).send(card);
+        res.status(200).send(card);
       } else {
         res.status(404).send('Карточкане не найдена');
       }
     })
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
+    .catch((error) => {
+      if (error.name === 'DocumentNotFoundError') {
         res.status(404).send({ message: 'Карточкане не найдена' });
         return;
       }
-      if (err.name === 'CastError') {
+      if (error.name === 'CastError') {
         res.status(400).send({ message: 'Введены не верные данные id карточки' });
         return;
       }
