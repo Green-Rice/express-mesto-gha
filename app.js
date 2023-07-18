@@ -23,7 +23,7 @@ app.use((req, _res, next) => {
 app.use('/cards', routerCard);
 app.use('/users', routerUser);
 
-app.get('*', (_req, res, next) => {
+app.get('/*', (_req, res, next) => {
   res.status(404).send({ message: 'Запрашиваемая страница не найдена!' });
   next();
 });

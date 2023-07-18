@@ -23,10 +23,10 @@ const deleteCardById = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
-      if (card) {
-        res.status(200).send(card);
-      } else {
+      if (!card) {
         res.status(404).send('Карточкане не найдена');
+      } else {
+        res.status(200).send(card);
       }
     })
     .catch((error) => {
