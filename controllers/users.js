@@ -1,6 +1,5 @@
 const User = require('../models/user');
-const bcrypt = require('bcryptjs');
-
+const bcrypt = require('bcrypt');
 const getUsers = (_req, res) => {
   User.find({})
     .then((Users) => res.status(200).send(Users))
