@@ -1,3 +1,5 @@
+const ForbiddenError = require('../errors/ForbiddenError')
+const BadRequestError= require('../errors/BadRequestError')
 const Card = require('../models/card');
 
 const getCars = (_req, res) => {
@@ -19,22 +21,24 @@ const createNewCard = (req, res) => {
     });
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Карточка не найдена!' });
-      } else {
-        res.status(200).send(card);
       }
+      if (card.owner.toString() !== req.user._id) {
+        return next(new ForbiddenError('Нет на это права'))
+      }
+      Card.findByIdAndRemove(cardId)
+      .then((user) => res.status(201).send(user))
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        res.status(400).send({ message: 'Введены не верные данные id карточки' });
-        return;
+        return next(new BadRequestError('Введены не верные данные id карточки'))
       }
-      res.status(500).send({ message: 'Произошла ошибка сервера' });
+      return next(err);
     });
 };
 

@@ -1,6 +1,9 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+
 
 const getUsers = (_req, res) => {
   User.find({})
@@ -28,6 +31,23 @@ const getUserId = (req, res) => {
         return;
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
+    });
+};
+
+const actualUser = (req, res, next) => {
+  User
+    .findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
+      }
+      res.send( user );
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new BadRequestError('Переданы некорректные данные'));
+      }
+      return next(err);
     });
 };
 
@@ -130,15 +150,7 @@ const login = (req, res) => {
     });
 };
 
-const actualUser = (req, res, next) => {
-  const { userId } = req.user._id;
 
-  User.findOne(userId)
-  .then((user) => {
-    res.status(200).send(user);
-  })
-  .catch(next);
-};
 
 module.exports = {
   getUsers, getUserId, createNewUser, updateUser, updateAvatar, login, actualUser
