@@ -1,9 +1,9 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
+const { celebrate, Joi } = require('celebrate');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
-const { celebrate, Joi } = require('celebrate');
 const { login, createNewUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/NotFoundError');
@@ -23,24 +23,23 @@ app.post('/signup', celebrate({
     avatar: Joi.string().regex(/https?:\/\/(www\.)?[-\w@:%\.\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\.\+~#=//?&]*)/i),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
-  })
+  }),
 }), createNewUser);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
-  })
+  }),
 }), login);
 
-app.use( auth );
-
+app.use(auth);
 
 app.use('/cards', routerCard);
 app.use('/users', routerUser);
 
-app.use('/*', () => {
-   throw new NotFoundError('Запрашиваемая страница не найдена');
+app.use('/*', (next) => {
+  next(new NotFoundError('Запрашиваемая страница не найдена'));
 });
 
 app.listen(PORT, () => {

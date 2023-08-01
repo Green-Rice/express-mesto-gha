@@ -1,12 +1,12 @@
-const ForbiddenError = require('../errors/ForbiddenError')
-const BadRequestError = require('../errors/BadRequestError')
+const ForbiddenError = require('../errors/ForbiddenError');
+const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const Card = require('../models/card');
 
-const getCars = (_req, res) => {
+const getCars = (_req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch((err) => { return next(err) });
+    .catch((err) => next(err));
 };
 
 const createNewCard = (req, res, next) => {
@@ -29,14 +29,14 @@ const deleteCardById = (req, res, next) => {
         throw new NotFoundError('Запрашиваемый карточка не найдена');
       }
       if (card.owner.toString() !== req.user._id) {
-        return next(new ForbiddenError('Нет прав на удаление карточки'))
+        return next(new ForbiddenError('Нет прав на удаление карточки'));
       }
       Card.findByIdAndRemove(cardId)
-        .then((user) => res.status(201).send(user))
+        .then((user) => res.status(201).send(user));
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        return next(new BadRequestError('Введены не верные данные id карточки'))
+        return next(new BadRequestError('Введены не верные данные id карточки'));
       }
       return next(err);
     });
@@ -57,7 +57,7 @@ const setLikesCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestError('Введены не верные данные id карточки'))
+        return next(new BadRequestError('Введены не верные данные id карточки'));
       }
       return next(err);
     });
@@ -77,7 +77,7 @@ const removeLikesCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestError('Введены не верные данные id карточки'))
+        return next(new BadRequestError('Введены не верные данные id карточки'));
       }
       return next(err);
     });
