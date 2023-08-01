@@ -3,9 +3,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
-const {celebrate, Joi} = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
 const { login, createNewUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 
@@ -14,14 +15,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 const app = express();
 
 app.use(bodyParser.json());
-
-  // app.use((req, _res, next) => {
-  //   req.user = {
-  //     _id: '64b2de316e9b6d425100f594', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  //   };
-
-  //   next();
-  // });
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -46,8 +39,8 @@ app.use( auth );
 app.use('/cards', routerCard);
 app.use('/users', routerUser);
 
-app.use('/*', (_req, _res, next) => {
-  next(new NotFoundError('Запрашиваемая страница не найдена'));
+app.use('/*', () => {
+   throw new NotFoundError('Запрашиваемая страница не найдена');
 });
 
 app.listen(PORT, () => {
