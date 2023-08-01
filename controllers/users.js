@@ -3,34 +3,29 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const ConflictingRequestError = require('../errors/BadRequestError');
 
-
-const getUsers = (_req, res) => {
+const getUsers = (_req, res, next) => {
   User.find({})
     .then((Users) => res.status(200).send(Users))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка сервера' }));
+    .catch((err) =>{return next(err)});
 };
 
-const getUserId = (req, res) => {
+const getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
       if (user) {
         res.status(200).send(user);
       } else {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
       }
     })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
-      }
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Введены не верные данные id пользователя' });
-        return;
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
-      res.status(500).send({ message: 'Произошла ошибка сервера' });
+      return next(err);
     });
 };
 
@@ -41,7 +36,7 @@ const actualUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Запрашиваемый пользователь не найден');
       }
-      res.send( user );
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -52,7 +47,7 @@ const actualUser = (req, res, next) => {
 };
 
 // Создание нового пользователя
-const createNewUser = (req, res) => {
+const createNewUser = (req, res, next) => {
   const { name, about, avatar, email, password, } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
@@ -73,10 +68,12 @@ const createNewUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Передали не валидные данные в форму' });
-        return;
+        return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       }
-      res.status(500).send({ message: 'Произошла ошибка сервера' });
+      if (err.code === 11000) {
+        return next(new ConflictingRequestError('Пользователь с таким EMAIL уже зарегистрирован!'));
+      }
+      return next(err)
     });
 };
 const updateUser = (req, res) => {
@@ -86,54 +83,36 @@ const updateUser = (req, res) => {
       if (user) {
         res.status(200).send({ name: user.name, about: user.about });
       } else {
-        res.status(404).send(`Пользователь с id: ${req.user._id} не найден`);
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
       }
     })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
-      }
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Передали не валидные данные в форму' });
-        return;
+        return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       }
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Введены не верные данные id пользователя' });
-        return;
-      }
-      res.status(500).send({ message: 'Произошла ошибка сервера' });
+      return next(err);
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res,next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (user) {
         res.status(200).send({ avatar: user.avatar });
       } else {
-        res.status(404).send(`Пользователь с id: ${req.user._id} не найден`);
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
       }
     })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
-      }
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Передали не валидные данные в форму' });
-        return;
+        return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       }
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Введены не верные данные id пользователя' });
-        return;
-      }
-      res.status(500).send({ message: 'Произошла ошибка сервера' });
+      return next(err);
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -143,11 +122,7 @@ const login = (req, res) => {
         { expiresIn: '7d' });
       res.send({ token })
     })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
 
 

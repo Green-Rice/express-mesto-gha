@@ -46,9 +46,8 @@ app.use( auth );
 app.use('/cards', routerCard);
 app.use('/users', routerUser);
 
-app.use('/*', (_req, res, next) => {
-  res.status(404).send({ message: 'Запрашиваемая страница не найдена!' });
-  next();
+app.use('/*', (_req, _res, next) => {
+  next(new NotFoundError('Запрашиваемая страница не найдена'));
 });
 
 app.listen(PORT, () => {
