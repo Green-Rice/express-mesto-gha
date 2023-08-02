@@ -69,10 +69,10 @@ const createNewUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.code === 11000) {
-        next(new ConflictingRequestError('Пользователь с таким EMAIL уже зарегистрирован!'));
-      } else if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+      } else if (err.code === 11000) {
+        next(new ConflictingRequestError('Пользователь с таким EMAIL уже зарегистрирован!'));
       } else { return next(err); }
     });
 };

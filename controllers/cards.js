@@ -34,8 +34,8 @@ const deleteCardById = (req, res, next) => {
       Card.findByIdAndRemove(cardId)
         .then((user) => res.status(201).send(user));
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
+    .catch((err) => {
+      if (err.name === 'CastError') {
         return next(new BadRequestError('Введены не верные данные id карточки'));
       }
       return next(err);
