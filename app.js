@@ -2,10 +2,12 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 const { login, createNewUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const errorsHandler = require('./middlewares/errorsHandler');
 const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
@@ -15,6 +17,13 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 const app = express();
 
 app.use(bodyParser.json());
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -26,13 +35,6 @@ app.post('/signup', celebrate({
   }),
 }), createNewUser);
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
-
 app.use(auth);
 
 app.use('/cards', routerCard);
@@ -41,6 +43,11 @@ app.use('/users', routerUser);
 app.use('/*', (next) => {
   next(new NotFoundError('Запрашиваемая страница не найдена'));
 });
+
+app.use(errors()); // обработчик ошибок celebrate
+
+// наш централизованный обработчик
+app.use(errorsHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

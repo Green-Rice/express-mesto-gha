@@ -48,7 +48,9 @@ const actualUser = (req, res, next) => {
 
 // Создание нового пользователя
 const createNewUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
@@ -74,7 +76,7 @@ const createNewUser = (req, res, next) => {
       } else { return next(err); }
     });
 };
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
@@ -86,7 +88,7 @@ const updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+        next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       }
       return next(err);
     });
@@ -120,7 +122,7 @@ const login = (req, res, next) => {
         'some-secret-key',
         { expiresIn: '7d' },
       );
-      res.send({ token });
+      res.status(200).send({ token });
     })
     .catch(next);
 };
