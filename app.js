@@ -3,10 +3,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
-const routerUser = require('./routes/users');
-const routerCard = require('./routes/cards');
 const { login, createNewUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const routerUser = require('./routes/users');
+const routerCard = require('./routes/cards');
 const errorsHandler = require('./middlewares/errorsHandler');
 const NotFoundError = require('./errors/NotFoundError');
 
@@ -40,8 +40,8 @@ app.use(auth);
 app.use('/cards', routerCard);
 app.use('/users', routerUser);
 
-app.use('/*', (next) => {
-  next(new NotFoundError('Запрашиваемая страница не найдена'));
+app.use('/*', () => {
+  throw new NotFoundError('Запрашиваемая страница не найдена');
 });
 
 app.use(errors()); // обработчик ошибок celebrate
