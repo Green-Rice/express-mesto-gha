@@ -13,4 +13,4 @@ const errorsHandler = (err, _req, res, next) => {
   next();
 };
 
-module.exports = { errorsHandler };
+module.exports = errorsHandler;
