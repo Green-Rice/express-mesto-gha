@@ -88,7 +88,7 @@ const updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+        next(new BadRequestError('Переданы некорректные данные'));
       }
       return next(err);
     });
@@ -101,12 +101,12 @@ const updateAvatar = (req, res, next) => {
       if (user) {
         res.status(200).send({ avatar: user.avatar });
       } else {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        throw new NotFoundError('Запрашиваемый карточка не найдена');
       }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+        return next(new BadRequestError('Переданы некорректные данные'));
       }
       return next(err);
     });
@@ -122,7 +122,7 @@ const login = (req, res, next) => {
         'some-secret-key',
         { expiresIn: '7d' },
       );
-      res.cookie('token', token, { maxAge: 3600000, httpOnly: true }).status(200).send('Авторизация прошла успешно!');
+      res.status(200).send({ token });
     })
     .catch(next);
 };
